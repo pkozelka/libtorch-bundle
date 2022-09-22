@@ -94,9 +94,8 @@
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
                                 <zip destfile="target/bundles/linux_64.jar" basedir="target/bundles" includes="linux_64/**"/>
-                                <!-- -->
-<!--
-                                <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/macos">
+
+                                <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/osx_64">
                                     <patternset>
                                         <include name="libtorch/lib/libc10.dylib"/>
                                         <include name="libtorch/lib/libfbjni.dylib"/>
@@ -107,11 +106,9 @@
                                     </patternset>
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
-                                <zip destfile="target/bundles/macos.jar" basedir="target/bundles" includes="macos/**"/>
--->
-                                <!-- -->
-<!--
-                                <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows">
+                                <zip destfile="target/bundles/osx_64.jar" basedir="target/bundles" includes="macos/**"/>
+
+                                <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows_64">
                                     <patternset>
                                         <include name="libtorch/lib/c10.dll"/>
                                         <include name="libtorch/lib/fbjni.dll"/>
@@ -122,8 +119,7 @@
                                     </patternset>
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
-                                <zip destfile="target/bundles/windows.jar" basedir="target/bundles" includes="windows/**"/>
--->
+                                <zip destfile="target/bundles/windows_64.jar" basedir="target/bundles" includes="windows_64/**"/>
                             </target>
                         </configuration>
                     </execution>
@@ -147,18 +143,16 @@
                                     <type>jar</type>
                                     <classifier>linux_64</classifier>
                                 </artifact>
-<!--
                                 <artifact>
-                                    <file>target/bundles/macos.jar</file>
+                                    <file>target/bundles/osx_64.jar</file>
                                     <type>jar</type>
-                                    <classifier>macos</classifier>
+                                    <classifier>osx_64</classifier>
                                 </artifact>
                                 <artifact>
-                                    <file>target/bundles/windows.jar</file>
+                                    <file>target/bundles/windows_64.jar</file>
                                     <type>jar</type>
-                                    <classifier>windows</classifier>
+                                    <classifier>windows_64</classifier>
                                 </artifact>
--->
                             </artifacts>
                         </configuration>
                     </execution>
@@ -170,7 +164,9 @@
                 <version>2.18.1</version>
                 <configuration>
                     <additionalClasspathElements>
-                        <directory>target/bundles/linux_64.jar</directory>
+                        <additionalClasspathElement>target/bundles/linux_64.jar</additionalClasspathElement>
+                        <additionalClasspathElement>target/bundles/windows_64.jar</additionalClasspathElement>
+                        <additionalClasspathElement>target/bundles/osx_64.jar</additionalClasspathElement>
                     </additionalClasspathElements>
                 </configuration>
             </plugin>

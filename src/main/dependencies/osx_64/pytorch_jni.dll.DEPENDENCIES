@@ -1,0 +1,5 @@
+# OSX dependencies
+libfbjni.dll
+libtorch.dll
+libtorch_cpu.dll
+libc10.dll
