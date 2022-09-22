@@ -97,12 +97,15 @@
 
                                 <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/osx_64">
                                     <patternset>
+                                        <include name="libtorch/lib/*.dylib"/>
+<!--
                                         <include name="libtorch/lib/libc10.dylib"/>
                                         <include name="libtorch/lib/libfbjni.dylib"/>
                                         <include name="libtorch/lib/libiomp5.dylib"/>
                                         <include name="libtorch/lib/libpytorch_jni.dylib"/>
                                         <include name="libtorch/lib/libtorch.dylib"/>
                                         <include name="libtorch/lib/libtorch_cpu.dylib"/>
+-->
                                     </patternset>
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
@@ -110,12 +113,15 @@
 
                                 <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows_64">
                                     <patternset>
+                                        <include name="libtorch/lib/*.dll"/>
+<!--
                                         <include name="libtorch/lib/c10.dll"/>
                                         <include name="libtorch/lib/fbjni.dll"/>
                                         <include name="libtorch/lib/libiomp5md.dll"/>
                                         <include name="libtorch/lib/pytorch_jni.dll"/>
                                         <include name="libtorch/lib/torch.dll"/>
                                         <include name="libtorch/lib/torch_cpu.dll"/>
+-->
                                     </patternset>
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
