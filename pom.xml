@@ -109,7 +109,7 @@
                                     </patternset>
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
-                                <zip destfile="target/bundles/osx_64.jar" basedir="target/bundles" includes="macos/**"/>
+                                <zip destfile="target/bundles/osx_64.jar" basedir="target/bundles" includes="osx_64/**"/>
 
                                 <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows_64">
                                     <patternset>
