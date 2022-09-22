@@ -23,6 +23,33 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.pytorch</groupId>
+            <artifactId>pytorch_java_only</artifactId>
+            <version>1.12.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.facebook.soloader</groupId>
+            <artifactId>nativeloader</artifactId>
+            <version>0.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scijava</groupId>
+            <artifactId>native-lib-loader</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.32</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.32</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
@@ -68,6 +95,7 @@
                                 </unzip>
                                 <zip destfile="target/bundles/linux_64.jar" basedir="target/bundles" includes="linux_64/**"/>
                                 <!-- -->
+<!--
                                 <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/macos">
                                     <patternset>
                                         <include name="libtorch/lib/libc10.dylib"/>
@@ -80,7 +108,9 @@
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
                                 <zip destfile="target/bundles/macos.jar" basedir="target/bundles" includes="macos/**"/>
+-->
                                 <!-- -->
+<!--
                                 <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows">
                                     <patternset>
                                         <include name="libtorch/lib/c10.dll"/>
@@ -89,25 +119,11 @@
                                         <include name="libtorch/lib/pytorch_jni.dll"/>
                                         <include name="libtorch/lib/torch.dll"/>
                                         <include name="libtorch/lib/torch_cpu.dll"/>
-<!--
-asmjit.dll
-c10.dll
-caffe2_detectron_ops.dll
-caffe2_module_test_dynamic.dll
-fbgemm.dll
-fbjni.dll
-libiomp5md.dll
-libiompstubs5md.dll
-pytorch_jni.dll
-torch.dll
-torch_cpu.dll
-torch_global_deps.dll
-uv.dll
--->
                                     </patternset>
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
                                 <zip destfile="target/bundles/windows.jar" basedir="target/bundles" includes="windows/**"/>
+-->
                             </target>
                         </configuration>
                     </execution>
@@ -131,6 +147,7 @@ uv.dll
                                     <type>jar</type>
                                     <classifier>linux_64</classifier>
                                 </artifact>
+<!--
                                 <artifact>
                                     <file>target/bundles/macos.jar</file>
                                     <type>jar</type>
@@ -141,10 +158,21 @@ uv.dll
                                     <type>jar</type>
                                     <classifier>windows</classifier>
                                 </artifact>
+-->
                             </artifacts>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <additionalClasspathElements>
+                        <directory>target/bundles/linux_64.jar</directory>
+                    </additionalClasspathElements>
+                </configuration>
             </plugin>
         </plugins>
     </build>
