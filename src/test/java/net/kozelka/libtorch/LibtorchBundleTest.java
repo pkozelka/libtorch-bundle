@@ -30,8 +30,5 @@ public class LibtorchBundleTest {
         final Tensor output = result.toTensor();
         System.out.println("shape: " + Arrays.toString(output.shape()));
         System.out.println("data: " + Arrays.toString(output.getDataAsFloatArray()));
-
-        // Workaround for https://github.com/facebookincubator/fbjni/issues/25
-//        System.exit(0);
     }
 }
