@@ -1,0 +1,7 @@
+# objdump -p libfbjni.so | grep NEEDED
+libstdc++.so.6
+libm.so.6
+libgomp-a34b3233.so.1
+libgcc_s.so.1
+libpthread.so.0
+libc.so.6

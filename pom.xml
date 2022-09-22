@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.kozelka.ai</groupId>
+    <artifactId>libtorch-bundle</artifactId>
+    <version>1.9.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>net.kozelka.maven</groupId>
+        <artifactId>kozelka-pom</artifactId>
+        <version>1.0.0</version>
+        <relativePath />
+    </parent>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>bundle</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="lib"/>
+                                <property name="libtorch.version" value="1.9.0"/>
+                                <get dest="lib" usetimestamp="true">
+                                    <url url="https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-${libtorch.version}%2Bcpu.zip"/>
+                                    <url url="https://download.pytorch.org/libtorch/cpu/libtorch-macos-${libtorch.version}.zip"/>
+                                    <url url="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip"/>
+                                </get>
+                                <copy todir="target/bundles">
+                                    <fileset dir="src/main/dependencies"/>
+                                </copy>
+                                <unzip src="lib/libtorch-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/linux_64">
+                                    <patternset>
+                                        <include name="libtorch/lib/libc10.so"/>
+                                        <include name="libtorch/lib/libfbjni.so"/>
+                                        <include name="libtorch/lib/libgomp-a34b3233.so.1"/>
+                                        <include name="libtorch/lib/libpytorch_jni.so"/>
+                                        <include name="libtorch/lib/libtorch.so"/>
+                                        <include name="libtorch/lib/libtorch_cpu.so"/>
+                                    </patternset>
+                                    <globmapper from="libtorch/lib/*" to="*"/>
+                                </unzip>
+                                <zip destfile="target/bundles/linux_64.jar" basedir="target/bundles" includes="linux_64/**"/>
+                                <!-- -->
+                                <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/macos">
+                                    <patternset>
+                                        <include name="libtorch/lib/libc10.dylib"/>
+                                        <include name="libtorch/lib/libfbjni.dylib"/>
+                                        <include name="libtorch/lib/libiomp5.dylib"/>
+                                        <include name="libtorch/lib/libpytorch_jni.dylib"/>
+                                        <include name="libtorch/lib/libtorch.dylib"/>
+                                        <include name="libtorch/lib/libtorch_cpu.dylib"/>
+                                    </patternset>
+                                    <globmapper from="libtorch/lib/*" to="*"/>
+                                </unzip>
+                                <zip destfile="target/bundles/macos.jar" basedir="target/bundles" includes="macos/**"/>
+                                <!-- -->
+                                <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows">
+                                    <patternset>
+                                        <include name="libtorch/lib/c10.dll"/>
+                                        <include name="libtorch/lib/fbjni.dll"/>
+                                        <include name="libtorch/lib/libiomp5md.dll"/>
+                                        <include name="libtorch/lib/pytorch_jni.dll"/>
+                                        <include name="libtorch/lib/torch.dll"/>
+                                        <include name="libtorch/lib/torch_cpu.dll"/>
+<!--
+asmjit.dll
+c10.dll
+caffe2_detectron_ops.dll
+caffe2_module_test_dynamic.dll
+fbgemm.dll
+fbjni.dll
+libiomp5md.dll
+libiompstubs5md.dll
+pytorch_jni.dll
+torch.dll
+torch_cpu.dll
+torch_global_deps.dll
+uv.dll
+-->
+                                    </patternset>
+                                    <globmapper from="libtorch/lib/*" to="*"/>
+                                </unzip>
+                                <zip destfile="target/bundles/windows.jar" basedir="target/bundles" includes="windows/**"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>target/bundles/linux_64.jar</file>
+                                    <type>jar</type>
+                                    <classifier>linux_64</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>target/bundles/macos.jar</file>
+                                    <type>jar</type>
+                                    <classifier>macos</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>target/bundles/windows.jar</file>
+                                    <type>jar</type>
+                                    <classifier>windows</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

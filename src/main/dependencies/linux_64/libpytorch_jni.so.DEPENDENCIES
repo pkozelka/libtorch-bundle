@@ -1,0 +1,9 @@
+# objdump -p libpytorch_jni.so | grep NEEDED
+libfbjni.so
+libtorch.so
+libtorch_cpu.so
+libc10.so
+libstdc++.so.6
+libgcc_s.so.1
+libc.so.6
+ld-linux-x86-64.so.2
