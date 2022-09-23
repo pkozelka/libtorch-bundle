@@ -1,0 +1,5 @@
+# OSX dependencies
+libfbjni.dylib
+libtorch.dylib
+libtorch_cpu.dylib
+libc10.dylib
