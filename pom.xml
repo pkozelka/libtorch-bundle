@@ -71,92 +71,95 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target>
+                            <target xmlns:if="ant:if">
                                 <mkdir dir="lib"/>
                                 <property name="libtorch.version" value="1.9.0"/>
-                                <get dest="lib" usetimestamp="true">
-                                    <url url="https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-${libtorch.version}%2Bcpu.zip"/>
-                                    <url url="https://download.pytorch.org/libtorch/cpu/libtorch-macos-${libtorch.version}.zip"/>
-                                    <url url="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip"/>
-                                </get>
                                 <copy todir="target/bundles">
                                     <fileset dir="src/main/dependencies"/>
                                 </copy>
-                                <unzip src="lib/libtorch-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/linux_64">
-                                    <patternset>
-                                        <include name="libtorch/lib/libc10.so"/>
-                                        <include name="libtorch/lib/libfbjni.so"/>
-                                        <include name="libtorch/lib/libgomp-a34b3233.so.1"/>
-                                        <include name="libtorch/lib/libpytorch_jni.so"/>
-                                        <include name="libtorch/lib/libtorch.so"/>
-                                        <include name="libtorch/lib/libtorch_cpu.so"/>
-                                    </patternset>
-                                    <globmapper from="libtorch/lib/*" to="*"/>
-                                </unzip>
-                                <zip destfile="target/bundles/linux_64.jar" basedir="target/bundles" includes="linux_64/**"/>
 
-                                <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/osx_64">
-                                    <patternset>
-                                        <include name="libtorch/lib/libc10.dylib"/>
-                                        <include name="libtorch/lib/libfbjni.dylib"/>
-                                        <include name="libtorch/lib/libiomp5.dylib"/>
-                                        <include name="libtorch/lib/libpytorch_jni.dylib"/>
-                                        <include name="libtorch/lib/libtorch.dylib"/>
-                                        <include name="libtorch/lib/libtorch_cpu.dylib"/>
-                                    </patternset>
-                                    <globmapper from="libtorch/lib/*" to="*"/>
-                                </unzip>
-                                <zip destfile="target/bundles/osx_64.jar" basedir="target/bundles" includes="osx_64/**"/>
+                                <!-- in release mode, let's bundle all platforms -->
+                                <condition property="bundle_all">
+                                    <not>
+                                        <contains string="${project.version}_X" substring="-SNAPSHOT_X"/>
+                                    </not>
+                                </condition>
 
-                                <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows_64">
-                                    <patternset>
-                                        <include name="libtorch/lib/*.dll"/>
-<!--
-                                        <include name="libtorch/lib/c10.dll"/>
-                                        <include name="libtorch/lib/fbjni.dll"/>
-                                        <include name="libtorch/lib/libiomp5md.dll"/>
-                                        <include name="libtorch/lib/pytorch_jni.dll"/>
-                                        <include name="libtorch/lib/torch.dll"/>
-                                        <include name="libtorch/lib/torch_cpu.dll"/>
--->
-                                    </patternset>
-                                    <globmapper from="libtorch/lib/*" to="*"/>
-                                </unzip>
-                                <zip destfile="target/bundles/windows_64.jar" basedir="target/bundles" includes="windows_64/**"/>
+                                <!-- on Linux, bundle linux_64 -->
+                                <condition property="do_linux_64">
+                                    <or>
+                                        <os family="unix"/>
+                                        <istrue value="${bundle_all}"/>
+                                    </or>
+                                </condition>
+                                <sequential if:set="do_linux_64">
+                                    <get dest="lib" usetimestamp="true" src="https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-${libtorch.version}%2Bcpu.zip"/>
+                                    <unzip src="lib/libtorch-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/linux_64">
+                                        <patternset>
+                                            <include name="libtorch/lib/libc10.so"/>
+                                            <include name="libtorch/lib/libfbjni.so"/>
+                                            <include name="libtorch/lib/libgomp-a34b3233.so.1"/>
+                                            <include name="libtorch/lib/libpytorch_jni.so"/>
+                                            <include name="libtorch/lib/libtorch.so"/>
+                                            <include name="libtorch/lib/libtorch_cpu.so"/>
+                                        </patternset>
+                                        <globmapper from="libtorch/lib/*" to="*"/>
+                                    </unzip>
+                                    <zip destfile="target/bundles/linux_64.jar" basedir="target/bundles" includes="linux_64/**"/>
+                                    <attachartifact file="target/bundles/linux_64.jar" classifier="linux_64" type="jar"/>
+                                </sequential>
+
+                                <!-- on Mac, bundle osx_64 -->
+                                <condition property="do_osx_64">
+                                    <or>
+                                        <os family="mac"/>
+                                        <istrue value="${bundle_all}"/>
+                                    </or>
+                                </condition>
+                                <sequential if:set="do_osx_64">
+                                    <get dest="lib" usetimestamp="true" src="https://download.pytorch.org/libtorch/cpu/libtorch-macos-${libtorch.version}.zip"/>
+                                    <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/osx_64">
+                                        <patternset>
+                                            <include name="libtorch/lib/libc10.dylib"/>
+                                            <include name="libtorch/lib/libfbjni.dylib"/>
+                                            <include name="libtorch/lib/libiomp5.dylib"/>
+                                            <include name="libtorch/lib/libpytorch_jni.dylib"/>
+                                            <include name="libtorch/lib/libtorch.dylib"/>
+                                            <include name="libtorch/lib/libtorch_cpu.dylib"/>
+                                        </patternset>
+                                        <globmapper from="libtorch/lib/*" to="*"/>
+                                    </unzip>
+                                    <zip destfile="target/bundles/osx_64.jar" basedir="target/bundles" includes="osx_64/**"/>
+                                    <attachartifact file="target/bundles/osx_64.jar" classifier="osx_64" type="jar"/>
+                                </sequential>
+
+                                <!-- on Windows, bundle windows_64 -->
+                                <condition property="do_windows_64">
+                                    <or>
+                                        <os family="windows"/>
+                                        <istrue value="${bundle_all}"/>
+                                    </or>
+                                </condition>
+                                <sequential if:set="do_windows_64">
+                                    <get dest="lib" usetimestamp="true" src="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip"/>
+                                    <unzip src="lib/libtorch-win-shared-with-deps-${libtorch.version}%2Bcpu.zip" dest="target/bundles/windows_64">
+                                        <patternset>
+                                            <include name="libtorch/lib/*.dll"/>
+    <!--
+                                            <include name="libtorch/lib/c10.dll"/>
+                                            <include name="libtorch/lib/fbjni.dll"/>
+                                            <include name="libtorch/lib/libiomp5md.dll"/>
+                                            <include name="libtorch/lib/pytorch_jni.dll"/>
+                                            <include name="libtorch/lib/torch.dll"/>
+                                            <include name="libtorch/lib/torch_cpu.dll"/>
+    -->
+                                        </patternset>
+                                        <globmapper from="libtorch/lib/*" to="*"/>
+                                    </unzip>
+                                    <zip destfile="target/bundles/windows_64.jar" basedir="target/bundles" includes="windows_64/**"/>
+                                    <attachartifact file="target/bundles/windows_64.jar" classifier="windows_64" type="jar"/>
+                                </sequential>
                             </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>attach</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>target/bundles/linux_64.jar</file>
-                                    <type>jar</type>
-                                    <classifier>linux_64</classifier>
-                                </artifact>
-                                <artifact>
-                                    <file>target/bundles/osx_64.jar</file>
-                                    <type>jar</type>
-                                    <classifier>osx_64</classifier>
-                                </artifact>
-                                <artifact>
-                                    <file>target/bundles/windows_64.jar</file>
-                                    <type>jar</type>
-                                    <classifier>windows_64</classifier>
-                                </artifact>
-                            </artifacts>
                         </configuration>
                     </execution>
                 </executions>
