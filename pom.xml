@@ -97,15 +97,12 @@
 
                                 <unzip src="lib/libtorch-macos-${libtorch.version}.zip" dest="target/bundles/osx_64">
                                     <patternset>
-                                        <include name="libtorch/lib/*.dylib"/>
-<!--
                                         <include name="libtorch/lib/libc10.dylib"/>
                                         <include name="libtorch/lib/libfbjni.dylib"/>
                                         <include name="libtorch/lib/libiomp5.dylib"/>
                                         <include name="libtorch/lib/libpytorch_jni.dylib"/>
                                         <include name="libtorch/lib/libtorch.dylib"/>
                                         <include name="libtorch/lib/libtorch_cpu.dylib"/>
--->
                                     </patternset>
                                     <globmapper from="libtorch/lib/*" to="*"/>
                                 </unzip>
