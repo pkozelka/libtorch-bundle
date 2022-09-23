@@ -1,5 +1,12 @@
-# DLL dependencies
-fbjni.dll
-torch.dll
-torch_cpu.dll
+asmjit.dll
 c10.dll
+caffe2_detectron_ops.dll
+caffe2_module_test_dynamic.dll
+fbgemm.dll
+fbjni.dll
+libiomp5md.dll
+libiompstubs5md.dll
+torch_cpu.dll
+torch.dll
+torch_global_deps.dll
+uv.dll
