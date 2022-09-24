@@ -15,6 +15,8 @@
         <relativePath />
     </parent>
     <properties>
+        <!-- NOTE: keep project version consistent with libtorch version ! -->
+        <libtorch.version>1.9.0</libtorch.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -25,7 +27,7 @@
         <dependency>
             <groupId>org.pytorch</groupId>
             <artifactId>pytorch_java_only</artifactId>
-            <version>1.12.2</version>
+            <version>${libtorch.version}</version>
         </dependency>
         <dependency>
             <groupId>com.facebook.soloader</groupId>
@@ -72,8 +74,16 @@
                         </goals>
                         <configuration>
                             <target xmlns:if="ant:if">
+                                <!-- make sure that version of this project is related to the target libtorch release -->
+                                <fail message="ERROR: libtorch.version '${libtorch.version}' must prefix the project version but it does not: '${project.version}'">
+                                    <condition>
+                                        <not>
+                                            <contains string="@_${project.version}" substring="@_${libtorch.version}"/>
+                                        </not>
+                                    </condition>
+                                </fail>
+
                                 <mkdir dir="lib"/>
-                                <property name="libtorch.version" value="1.9.0"/>
                                 <copy todir="target/bundles">
                                     <fileset dir="src/main/dependencies"/>
                                 </copy>
