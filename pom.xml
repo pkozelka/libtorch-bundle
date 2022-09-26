@@ -137,7 +137,9 @@
                                 <condition property="do_windows_64">
                                     <or>
                                         <os family="windows"/>
+<!-- TODO: make this work on windows - for now, it's excluded from the release; see https://github.com/pkozelka/libtorch-bundle/issues/1
                                         <istrue value="${bundle_all}"/>
+-->
                                     </or>
                                 </condition>
                                 <sequential if:set="do_windows_64">

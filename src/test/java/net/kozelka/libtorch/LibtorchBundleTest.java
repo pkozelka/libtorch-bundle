@@ -20,6 +20,7 @@ public class LibtorchBundleTest {
     public void demoModel() {
         final File file = new File("src/test/data/demo-model.pt1").getAbsoluteFile();
         System.out.println("file = " + file);
+        System.out.println("java.library.path = " + System.getProperty("java.library.path")); // normally we don't need this property - but it can be handy for troubleshooting
         final Module mod = Module.load(file.getPath());
         final Tensor data =
             Tensor.fromBlob(
