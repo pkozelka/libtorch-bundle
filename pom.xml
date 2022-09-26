@@ -190,4 +190,9 @@
             </plugin>
         </plugins>
     </build>
+    <scm>
+        <connection>scm:git:http://github.com/pkozelka/libtorch-bundle.git</connection>
+        <developerConnection>scm:git:git@github.com:pkozelka/libtorch-bundle.git</developerConnection>
+        <url>https://github.com/pkozelka/libtorch-bundle</url>
+    </scm>
 </project>
