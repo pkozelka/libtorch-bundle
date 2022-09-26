@@ -19,7 +19,7 @@ jobs:
       windows_64: "target/bundles/windows_64.jar"
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 11
+    - name: Set up JDK 8
       uses: actions/setup-java@v3
       with:
         java-version: '8'
@@ -27,6 +27,26 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B verify -Dbundle_all
+    - uses: actions/upload-artifact@v3
+      with:
+        name: "libtorch-bundle-snapshot-linux_64"
+        path: target/bundles/linux_64.jar
+        if-no-files-found: error
+    - uses: actions/upload-artifact@v3
+      with:
+        name: "libtorch-bundle-snapshot-osx_64"
+        path: target/bundles/osx_64.jar
+        if-no-files-found: error
+    - uses: actions/upload-artifact@v3
+      with:
+        name: "libtorch-bundle-snapshot-windows_64"
+        path: target/bundles/windows_64.jar
+        if-no-files-found: warn
+    - uses: actions/upload-artifact@v3
+      with:
+        name: "libtorch-bundle-snapshot"
+        path: target/libtorch-bundle.jar
+        if-no-files-found: error
 
 #==== suppressed, windows version does not currently work, see https://github.com/pkozelka/libtorch-bundle/issues/1
 #  windows-build:
@@ -48,7 +68,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
