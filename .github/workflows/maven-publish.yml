@@ -1,11 +1,10 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+# This workflow prepares package for publishing in Maven Central via the Sonatype Nexus OSS Repository - https://oss.sonatype.org
 
-name: Maven Package
+name: Release to Maven Central
 
 on:
-  release:
-    types: [created]
+  issues:
+    types: [opened]
 
 jobs:
   build:
