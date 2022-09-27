@@ -7,19 +7,35 @@ on:
         description: "Line to be added into pom.xml"
         required: true
         type: string
+        default: blablabla
+
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
-  prepare-release:
+  line-add:
 
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
-    - name: Add the line and push it
+    - uses: actions/checkout@v3
+    - name: Add the line
       run: |
-        echo "<!-- ${{ inputs.what }}" >> pom.xml
-    - uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Line added
+        env | sort
+        ls -la
+        echo "<!-- A: ${{ inputs.what }} -->" >> pom.xml
+    - name: commit and push
+      run: |
+        echo "machine github.com" > "$HOME/.netrc"
+        echo "  login $GITHUB_ACTOR" >> "$HOME/.netrc"
+        echo "  password ${{ github.token }}" >> "$HOME/.netrc"
+        echo "machine api.github.com" >> "$HOME/.netrc"
+        echo "  login ${{ github.actor }}" >> "$HOME/.netrc"
+        echo "  password ${{ github.token }}" >> "$HOME/.netrc"
+        cat "$HOME/.netrc"
+        git config --global user.email "releasator@gmail.com"
+        git config --global user.name "Releasator"
+        ls -la
+        git commit -am "B line added"
+        git push

@@ -9,14 +9,14 @@ on:
         description: "Release version"
         required: true
         type: string
+        default: 1.9.0-alpha-1
 
 jobs:
-  prepare-release:
+  full-release:
 
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
+      contents: write
 
     steps:
     - uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
     - name: Switch to release version
       run: |
         mvn --batch-mode --show-version versions:set -DnewVersion=${{ inputs.release_version }}
-        sed -i 's:<scm>:<scm><tag>vRELEASE_VERSION</tag>:' pom.xml
+        sed -i 's:<scm>:<scm><tag>v${{ inputs.release_version }}</tag>:' pom.xml
 
     - name: Build release artifacts
       run: mvn --batch-mode deploy -Prelease -DaltDeploymentRepository=local::default::file://$PWD/target/release-package/maven-repository -DdeployAtEnd
@@ -51,8 +51,25 @@ jobs:
         env | sort
         echo "::notice file=pom.xml,line=1,endLine=5,title=Prepared::Prepared package for release ${{ inputs.release_version }}"
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: "libtorch-bundle-${{ inputs.release_version }}.release-package"
-        path: target/release-package
-        if-no-files-found: error
+#    - uses: actions/upload-artifact@v3
+#      with:
+#        name: "libtorch-bundle-${{ inputs.release_version }}.release-package"
+#        path: target/release-package
+#        if-no-files-found: error
+
+    - name: Initialize GPG
+      run: echo -n "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --import || exit 1
+    - name: Upload to Sonatype OSS Nexus
+      run: OSSRH_AUTH=${{ secrets.OSSRH_TOKEN }} ./upload.sh "5ae9af53a3aeee"
+    - name: Git operations - commit, tag, commit
+      run: |
+        echo "machine     github.com login $GITHUB_ACTOR password ${{ github.token }}" >> "$HOME/.netrc"
+        echo "machine api.github.com login $GITHUB_ACTOR password ${{ github.token }}" >> "$HOME/.netrc"
+        git config user.email "releasator@gmail.com"
+        git config user.name "Releasator"
+        cp -a target/release-package/pre-release/* .
+        git commit -am 'Released version ${{ inputs.release_version }}'
+        git tag v${{ inputs.release_version }}
+        cp -a target/release-package/post-release/* .
+        git commit -am 'Post-release changes'
+        git push && git push --tags
