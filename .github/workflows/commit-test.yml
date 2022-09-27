@@ -1,0 +1,25 @@
+name: Commit test (experiment)
+
+on:
+  workflow_dispatch:
+    inputs:
+      what:
+        description: "Line to be added into pom.xml"
+        required: true
+        type: string
+
+jobs:
+  prepare-release:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Add the line and push it
+      run: |
+        echo "<!-- ${{ inputs.what }}" >> pom.xml
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Line added
