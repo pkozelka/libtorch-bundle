@@ -22,13 +22,34 @@ jobs:
       with:
         java-version: '8'
         distribution: 'temurin'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        cache: maven
 
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - name: Save files for post-release step
+      run: |
+        env | sort
+        mkdir -p "target/release-package/post-release"
+        cp "pom.xml" "target/release-package/post-release/"
+        echo "GIT_REVISION: $(git rev-parse HEAD)" > "target/release-package/build.properties"
 
-    - name: Publish to GitHub Packages Apache Maven
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+    - name: Switch to release version
+      run: |
+        RELEASE_VERSION=${GITHUB_REF#refs/*/}
+        echo "RELEASE_VERSION=$RELEASE_VERSION"
+        mvn versions:set -DnewVersion=$RELEASE_VERSION
+        sed -i 's:<scm>:<scm><tag>vRELEASE_VERSION</scm>:' pom.xml
+        echo "TAG: v$RELEASE_VERSION" >> "target/release-package/build.properties"
+        echo "VERSION: $RELEASE_VERSION" >> "target/release-package/build.properties"
+
+    - name: Build release artifacts
+      run: mvn deploy -Prelease -DaltDeploymentRepository=local::default::file://$PWD/target/release-package/repository -DdeployAtEnd
+
+    - name: Save files for pre-release step
+      run: |
+        mkdir -p "target/release-package/pre-release"
+        cp "pom.xml" "target/release-package/pre-release/"
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: "release-package"
+        path: target/release-package
+        if-no-files-found: error
