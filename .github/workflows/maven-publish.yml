@@ -11,14 +11,12 @@ on:
         type: string
 
 jobs:
-  build:
+  prepare-release:
 
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    env:
-      RELEASE_VERSION: ${{ inputs.release_version }}
 
     steps:
     - uses: actions/checkout@v3
@@ -31,28 +29,30 @@ jobs:
 
     - name: Save files for post-release step
       run: |
-        env | sort
         mkdir -p "target/release-package/post-release"
         cp "pom.xml" "target/release-package/post-release/"
-        echo "GIT_REVISION: $GITHUB_SHA" > "target/release-package/build.properties"
 
     - name: Switch to release version
       run: |
-        mvn versions:set -DnewVersion=$RELEASE_VERSION
+        mvn --batch-mode --show-version versions:set -DnewVersion=${{ inputs.release_version }}
         sed -i 's:<scm>:<scm><tag>vRELEASE_VERSION</tag>:' pom.xml
-        echo "TAG: v$RELEASE_VERSION" >> "target/release-package/build.properties"
-        echo "VERSION: $RELEASE_VERSION" >> "target/release-package/build.properties"
 
     - name: Build release artifacts
-      run: mvn deploy -Prelease -DaltDeploymentRepository=local::default::file://$PWD/target/release-package/repository -DdeployAtEnd
+      run: mvn --batch-mode deploy -Prelease -DaltDeploymentRepository=local::default::file://$PWD/target/release-package/maven-repository -DdeployAtEnd
 
     - name: Save files for pre-release step
       run: |
         mkdir -p "target/release-package/pre-release"
         cp "pom.xml" "target/release-package/pre-release/"
+        echo "VERSION: ${{ inputs.release_version }}" > "target/release-package/build.properties"
+        echo "TAG: v${{ inputs.release_version }}" >> "target/release-package/build.properties"
+        echo "REVISION: $GITHUB_SHA" >> "target/release-package/build.properties"
+        echo -e "## Summary\n Version ${{ inputs.release_version }} is ready to be published" >> $GITHUB_STEP_SUMMARY
+        env | sort
+        echo "::notice file=pom.xml,line=1,endLine=5,title=Prepared::Prepared package for release ${{ inputs.release_version }}"
 
     - uses: actions/upload-artifact@v3
       with:
-        name: "release-package"
+        name: "libtorch-bundle-${{ inputs.release_version }}.release-package"
         path: target/release-package
         if-no-files-found: error
