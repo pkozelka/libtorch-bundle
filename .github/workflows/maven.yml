@@ -29,9 +29,7 @@ jobs:
       run: mvn -B verify -Dbundle_all
     - name: Test
       run: |
-        wget https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.32/slf4j-api-1.7.32.jar -O target/slf4j-api.jar.todo
         ls -la target
-        ls -la ~/.m2/repositories/
         java -cp target/libtorch-bundle.jar:target/bundles/linux_64.jar:target/slf4j-api.jar net.kozelka.libtorch.LibtorchBundle src/test/data/demo-model.pt1 | tee target/output.txt
         diff -u --color=always src/test/data/demo-model.pt1.output.txt target/output.txt
     - uses: actions/upload-artifact@v3
@@ -95,6 +93,7 @@ jobs:
 
   macos-test:
     runs-on: macos-latest
+    needs: linux-build
     steps:
       - uses: actions/download-artifact@v3
         with:
