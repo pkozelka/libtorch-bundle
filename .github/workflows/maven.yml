@@ -28,7 +28,11 @@ jobs:
     - name: Build with Maven
       run: mvn -B verify -Dbundle_all
     - name: Test
-      run: java -cp target/libtorch-bundle.jar:target/bundles/osx_64.jar:target/slf4j-api.jar net.kozelka.libtorch.LibtorchBundle src/test/data/demo-model.pt1
+      run: |
+        wget https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.32/slf4j-api-1.7.32.jar -O target/slf4j-api.jar.todo
+        ls -la target
+        ls -la ~/.m2/repositories/
+        java -cp target/libtorch-bundle.jar:target/bundles/linux_64.jar:target/slf4j-api.jar net.kozelka.libtorch.LibtorchBundle src/test/data/demo-model.pt1
     - uses: actions/upload-artifact@v3
       with:
         name: "libtorch-bundle-snapshot-linux_64"
