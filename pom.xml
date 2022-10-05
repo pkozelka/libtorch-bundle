@@ -87,6 +87,18 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>net.kozelka.libtorch.LibtorchBundle</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
@@ -98,6 +110,8 @@
                         </goals>
                         <configuration>
                             <target xmlns:if="ant:if">
+                                <!-- for test, lets pass this one closer -->
+                                <copy tofile="target/slf4j-api.jar" file="${org.slf4j:slf4j-api:jar}"/>
                                 <!-- make sure that version of this project is related to the target libtorch release -->
                                 <fail message="ERROR: libtorch.version '${libtorch.version}' must prefix the project version but it does not: '${project.version}'">
                                     <condition>
