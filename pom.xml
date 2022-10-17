@@ -228,6 +228,13 @@
             </plugin>
         </plugins>
     </build>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     <scm>
         <connection>scm:git:http://github.com/pkozelka/libtorch-bundle.git</connection>
         <developerConnection>scm:git:git@github.com:pkozelka/libtorch-bundle.git</developerConnection>
